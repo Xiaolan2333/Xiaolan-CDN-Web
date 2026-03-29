@@ -10,10 +10,10 @@ GitHub：https://github.com/Xiaolan2333/Xiaolan-CDN-Web
 
 ## 食用方法
 
-## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`）
-## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`）
-## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`）
-* 当然最好把用户名也改了
+## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`，修改完后需执行`systemctl restart xiaolan-cdn-web.service`重启后端！）
+## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`，修改完后需执行`systemctl restart xiaolan-cdn-web.service`重启后端！）
+## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`，修改完后需执行`systemctl restart xiaolan-cdn-web.service`重启后端！）
+* 当然最好把用户名也改了，修改完后需要执行`systemctl restart xiaolan-cdn-web.service`重启后端！
 
 #### 支持的操作系统
 主控：
@@ -45,6 +45,14 @@ wget https://raw.githubusercontent.com/Xiaolan2333/Xiaolan-CDN-Web/refs/heads/ma
 ```HTML
 const API_BASE = 'http://你的服务器IP:3000/api'; 
 ```
+
+修改`/opt/xiaolan-cdn-web/server.js`中的第`14`行和第`16`行：
+```HTML
+const JWT_SECRET = 'Welcome-to-Xiaolan-CDN-Web'; // JWT 签名密钥（建议随便打一串复杂的乱码）
+......
+const ADMIN_PASSWORD = 'Admin@Password'; // 密码
+```
+* 修改完后需要执行`systemctl restart xiaolan-cdn-web.service`重启后端
 
 在宝塔面板里--左侧边栏--网站--右侧PHP项目--中间添加站点新建一个站点：
 
@@ -111,6 +119,14 @@ systemctl daemon-reload && systemctl enable xiaolan-cdn-web.service --now
 ```HTML
 const API_BASE = 'http://你的服务器IP:3000/api'; 
 ```
+
+修改`/opt/xiaolan-cdn-web/server.js`中的第`14`行和第`16`行：
+```HTML
+const JWT_SECRET = 'Welcome-to-Xiaolan-CDN-Web'; // JWT 签名密钥（建议随便打一串复杂的乱码）
+......
+const ADMIN_PASSWORD = 'Admin@Password'; // 密码
+```
+* 修改完后需要执行`systemctl restart xiaolan-cdn-web.service`重启后端
 
 7.找个Nginx之类的，设置一个站点，目录就是你新建的文件夹的那个目录
 

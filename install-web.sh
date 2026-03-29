@@ -10,7 +10,7 @@ echo "创建目录"
 mkdir /opt/xiaolan-cdn-web
 echo "创建目录完成"
 echo "下载压缩包"
-wget -P /opt/xiaolan-cdn-web https://github.com/Xiaolan2333/Xiaolan-CDN/releases/latest/download/Xiaolan-CDN-Web.zip
+wget -P /opt/xiaolan-cdn-web https://github.com/Xiaolan2333/Xiaolan-CDN-Web/releases/latest/download/Xiaolan-CDN-Web.zip
 echo "压缩包下载完成"
 echo "解压压缩包"
 unzip /opt/xiaolan-cdn/Xiaolan-CDN-Web.zip -d /opt/xiaolan-cdn-web
@@ -20,7 +20,8 @@ echo "安装依赖"
 cd /opt/xiaolan-cdn-web && npm install
 echo "依赖安装完成"
 echo "设置Systemd配置文件"
-cat > /etc/systemd/system/xiaolan-cdn-web.service << 'EOF'
+NODE_PATH=$(which node)
+cat > /etc/systemd/system/xiaolan-cdn-web.service << EOF
 [Unit]
 Description=Xiaolan-CDN-Web
 After=network.target
@@ -29,7 +30,7 @@ After=network.target
 User=root
 Group=root
 WorkingDirectory=/opt/xiaolan-cdn-web
-ExecStart=node server.js
+ExecStart=$NODE_PATH server.js
 
 [Install]
 WantedBy=multi-user.target

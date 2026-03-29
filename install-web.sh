@@ -13,7 +13,7 @@ echo "下载压缩包"
 wget -P /opt/xiaolan-cdn-web https://github.com/Xiaolan2333/Xiaolan-CDN-Web/releases/latest/download/Xiaolan-CDN-Web.zip
 echo "压缩包下载完成"
 echo "解压压缩包"
-unzip /opt/xiaolan-cdn/Xiaolan-CDN-Web.zip -d /opt/xiaolan-cdn-web
+unzip /opt/xiaolan-cdn-web/Xiaolan-CDN-Web.zip -d /opt/xiaolan-cdn-web
 chmod -R 777 /opt/xiaolan-cdn-web
 echo "解压完成"
 echo "安装依赖"

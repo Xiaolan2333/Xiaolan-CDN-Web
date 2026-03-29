@@ -82,7 +82,7 @@ events {
 http {
     include       mime.types;
     default_type  application/octet-stream;
-    access_log /dev/null;
+    access_log /opt/xiaolan-cdn/logs/access.log;
     error_log /dev/null;
     sendfile on;
     tcp_nopush on;

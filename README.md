@@ -6,6 +6,8 @@ GitHub：https://github.com/Xiaolan2333/Xiaolan-CDN-Web
 
 此仓库为`Xiaolan-CDN`系统的面板，不包含系统本体
 
+## 由于本面板过于简陋，所以最好不要将本面板用在生产力环境
+
 ## 食用方法
 
 ## 请一定要手动修改`本程序目录/server.js`中的第`14`行和第`16`行的变量项！！（`JWT 签名密钥`和`密码`）
@@ -39,7 +41,7 @@ wget https://raw.githubusercontent.com/Xiaolan2333/Xiaolan-CDN-Web/refs/heads/ma
 ```
 脚本会自动安装`Node.js 24 LTS`并将面板安装到`/opt/xiaolan-cdn-web`
 
-修改`/opt/xiaolan-cdn-web/index.html`中的第`266`行为自己的接口地址：
+修改`/opt/xiaolan-cdn-web/index.html`中的第`214`行为自己的接口地址：
 ```HTML
 const API_BASE = 'http://你的服务器IP:3000/api'; 
 ```
@@ -87,7 +89,7 @@ mkdir 文件夹名 && cd 文件夹名
 
 2.下载主控文件：
 ```Bash
-wget https://github.com/Xiaolan2333/Xiaolan-CDN/releases/latest/download/Xiaolan-CDN-Web.zip
+wget https://github.com/Xiaolan2333/Xiaolan-CDN-Web/releases/latest/download/Xiaolan-CDN-Web.zip
 ```
 
 3.解压：
@@ -105,11 +107,16 @@ cp ./systemd/xiaolan-cdn-web.service /etc/systemd/system
 systemctl daemon-reload && systemctl enable xiaolan-cdn-web.service --now
 ```
 
-6.找个Nginx之类的，设置一个站点，目录就是你新建的文件夹的那个目录
+6.修改`/opt/xiaolan-cdn-web/index.html`中的第`214`行为自己的接口地址：
+```HTML
+const API_BASE = 'http://你的服务器IP:3000/api'; 
+```
+
+7.找个Nginx之类的，设置一个站点，目录就是你新建的文件夹的那个目录
 
 * 当然你也可以和半自动安装一样使用`宝塔面板`
 
-7.打开你设置的监听地址，开始愉快地玩耍
+8.打开你设置的监听地址，开始愉快地玩耍
 
 #### 如果安装Xiaolan-CDN主控时没有使用自动安装怎么使用`Xiaolan-CDN-Web`
 

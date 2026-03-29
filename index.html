@@ -7,26 +7,12 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 自定义滚动条样式*/
-        .custom-scrollbar::-webkit-scrollbar { 
-            height: 6px; 
-            width: 6px; 
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb { 
-            background-color: #cbd5e1; 
-            border-radius: 4px; 
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background-color: transparent;
-        }
-        /*隐藏移动端导航的滚动条*/
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background-color: transparent; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        [v-cloak] { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans">
@@ -59,20 +45,14 @@
             <div class="flex justify-between items-center w-full md:w-auto">
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold text-indigo-600">Xiaolan's CDN控制台</h1>
-                    <p class="text-xs sm:text-sm text-slate-500 mt-1">管理世界上最抽象的CDN系统（bushi）</p>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">管理世界上最抽象的CDN系统（bushi）版本：Xiaolan-CDN-Web-V0.0.2</p>
                 </div>
                 <button @click="handleLogout" class="md:hidden text-xs text-rose-500 bg-rose-50 px-3 py-1.5 rounded-lg">退出</button>
             </div>
             <div class="flex flex-row gap-2 w-full md:w-auto">
-                <button @click="triggerCmd('/sync')" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap shadow-sm">
-                    同步节点
-                </button>
-                <button @click="triggerCmd('/update')" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap shadow-sm">
-                    一键更新
-                </button>
-                <button @click="handleLogout" class="hidden md:block bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-lg text-sm font-medium transition shadow-sm">
-                    退出登录
-                </button>
+                <button @click="triggerCmd('/sync')" class="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap shadow-sm">同步节点</button>
+                <button @click="triggerCmd('/update')" class="flex-1 md:flex-none bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap shadow-sm">一键更新</button>
+                <button @click="handleLogout" class="hidden md:block bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-lg text-sm font-medium transition shadow-sm">退出登录</button>
             </div>
         </header>
 
@@ -85,164 +65,133 @@
                 <button @click="currentTab = 'console'" :class="tabClass(currentTab === 'console')">终端输出</button>
             </nav>
 
-            <main class="col-span-1 md:col-span-4 bg-white p-4 sm:p-6 rounded-xl shadow-sm min-h-[500px] sm:min-h-[600px] overflow-hidden">
+            <main class="col-span-1 md:col-span-4 bg-white p-4 sm:p-6 rounded-xl shadow-sm min-h-[500px] sm:min-h-[600px]">
                 <div v-if="currentTab === 'nginx'" class="space-y-4">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-2 gap-3">
                         <h2 class="text-lg sm:text-xl font-semibold">站点列表</h2>
-                        <button @click="addSite" class="w-full sm:w-auto text-sm bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-100 font-medium transition">
-                            + 添加新站点
-                        </button>
+                        <button @click="addSite" class="w-full sm:w-auto text-sm bg-indigo-50 text-indigo-600 px-4 py-2 rounded-lg hover:bg-indigo-100 font-medium transition">+ 添加新站点</button>
                     </div>
 
-                    <div v-for="(site, sIdx) in sites" :key="sIdx" class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:border-indigo-200 transition">
+                    <div v-for="(site, sIdx) in sites" :key="sIdx" class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 hover:border-indigo-200 transition mb-6">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <label class="text-sm font-medium text-slate-700">站点名称</label>
-                                <input v-model="site.name" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none" placeholder="例如: 主站">
+                                <input v-model="site.name" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="例如: 主站">
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-slate-700">源站地址</label>
-                                <input v-model="site.origin" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none" placeholder="例如: https://47.79.32.101:443/">
+                                <label class="text-sm font-medium text-slate-700">默认源站 (根路径/)</label>
+                                <input v-model="site.origin" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="例如: http://1.2.3.4:80">
                             </div>
                             <div class="col-span-1 sm:col-span-2">
                                 <label class="text-sm font-medium text-slate-700">绑定域名 (空格分隔)</label>
-                                <input :value="site.domains.join(' ')" @input="e => site.domains = e.target.value.split(' ')" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none" placeholder="例如: *.xiaolan.xin xiaolan.xin">
+                                <input :value="site.domains.join(' ')" @input="e => site.domains = e.target.value.split(' ')" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="example.com www.example.com">
                             </div>
                             <div>
                                 <label class="text-sm font-medium text-slate-700">绑定 SSL 证书</label>
-                                <select v-model="site.sslCertName" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
+                                <select v-model="site.sslCertName" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm outline-none bg-white">
                                     <option value="">请选择证书</option>
                                     <option v-for="ssl in sslList" :key="ssl" :value="ssl">{{ ssl }}</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-sm font-medium text-slate-700">缓存文件后缀</label>
-                                <input v-model="site.cacheExts" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none" placeholder="css|jpeg|jpg|png...">
+                                <label class="text-sm font-medium text-slate-700">缓存后缀</label>
+                                <input v-model="site.cacheExts" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm outline-none" placeholder="css|jpg|png|js">
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-4 border-t border-slate-200">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-sm font-bold text-indigo-600">分路径回源</label>
+                                <button @click="addLocation(site)" class="text-xs bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-md hover:bg-indigo-100 transition">+ 添加规则</button>
+                            </div>
+                            <div v-for="(loc, lIdx) in site.locations" :key="lIdx" class="bg-white p-3 rounded-lg border border-slate-200 mb-2 space-y-2">
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                    <input v-model="loc.path" type="text" class="border border-slate-300 rounded-md p-2 text-xs" placeholder="路径 (如: /api/)">
+                                    <input v-model="loc.origin" type="text" class="border border-slate-300 rounded-md p-2 text-xs" placeholder="回源地址 (带协议)">
+                                    <div class="flex gap-2">
+                                        <input v-model="loc.host" type="text" class="border border-slate-300 rounded-md p-2 text-xs flex-1" placeholder="Host头 (选填)">
+                                        <button @click="site.locations.splice(lIdx, 1)" class="text-rose-500 hover:text-rose-700 p-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="mt-5 pt-4 border-t border-slate-200">
                             <div class="flex justify-between items-center mb-3">
-                                <label class="text-sm font-medium text-slate-700">域名重定向 (选填)</label>
-                                <button @click="addRedirect(site)" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-md transition">+ 添加</button>
+                                <label class="text-sm font-medium text-slate-700">域名重定向 (301)</label>
+                                <button @click="addRedirect(site)" class="text-xs bg-slate-200 text-slate-700 px-3 py-1.5 rounded-md">+ 添加</button>
                             </div>
                             <div v-for="(red, rIdx) in site.redirects" :key="rIdx" class="flex flex-col sm:flex-row gap-2 mt-2">
-                                <input v-model="red.from" type="text" class="border border-slate-300 rounded-lg p-2 text-sm w-full sm:w-1/2" placeholder="来源域名 (如: xiaolan.xin)">
+                                <input v-model="red.from" type="text" class="border border-slate-300 rounded-lg p-2 text-sm w-full sm:w-1/2" placeholder="来源域名">
                                 <div class="flex gap-2 w-full sm:w-1/2">
-                                    <input v-model="red.to" type="text" class="border border-slate-300 rounded-lg p-2 text-sm flex-1" placeholder="跳转至 (如: www.xiaolan.xin)">
-                                    <button @click="site.redirects.splice(rIdx, 1)" class="bg-rose-50 text-rose-600 px-3 py-2 rounded-lg text-sm hover:bg-rose-100 transition whitespace-nowrap">删除</button>
+                                    <input v-model="red.to" type="text" class="border border-slate-300 rounded-lg p-2 text-sm flex-1" placeholder="跳转至">
+                                    <button @click="site.redirects.splice(rIdx, 1)" class="bg-rose-50 text-rose-600 px-3 py-2 rounded-lg text-sm transition">删除</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mt-4 flex justify-end">
-                            <button @click="sites.splice(sIdx, 1)" class="w-full sm:w-auto text-sm text-red-500 bg-red-50 hover:bg-red-100 px-4 py-2 rounded-lg transition">删除此站点</button>
+                            <button @click="sites.splice(sIdx, 1)" class="text-sm text-red-500 bg-red-50 px-4 py-2 rounded-lg transition">删除站点</button>
                         </div>
                     </div>
-
-                    <button @click="saveNginx" class="w-full bg-slate-800 hover:bg-slate-900 text-white p-3 sm:p-3.5 rounded-xl mt-4 font-medium transition shadow-sm text-base">保存并生成 nginx.conf</button>
+                    <button @click="saveNginx" class="w-full bg-slate-800 text-white p-4 rounded-xl mt-4 font-medium">更新nginx.conf文件</button>
                 </div>
 
                 <div v-if="currentTab === 'ssl'" class="space-y-6">
                     <h2 class="text-lg sm:text-xl font-semibold">SSL 证书管理</h2>
-                    <div class="bg-slate-50 border border-slate-200 p-4 sm:p-5 rounded-xl">
+                    <div class="bg-slate-50 border border-slate-200 p-5 rounded-xl">
                         <div class="grid grid-cols-1 gap-4 mb-4">
-                            <div>
-                                <label class="text-sm font-medium text-slate-700">证书名称</label>
-                                <input v-model="newSsl.name" type="text" class="w-full mt-1.5 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none" placeholder="例如: xiaolan.xin">
-                            </div>
-                            <div>
-                                <label class="text-sm font-medium text-slate-700">公钥内容 (Pem)</label>
-                                <textarea v-model="newSsl.pem" class="w-full mt-1.5 border border-slate-300 rounded-lg p-3 text-xs font-mono h-28 focus:ring-2 focus:ring-indigo-100 outline-none custom-scrollbar" placeholder="-----BEGIN CERTIFICATE-----"></textarea>
-                            </div>
-                            <div>
-                                <label class="text-sm font-medium text-slate-700">私钥内容 (Key)</label>
-                                <textarea v-model="newSsl.key" class="w-full mt-1.5 border border-slate-300 rounded-lg p-3 text-xs font-mono h-28 focus:ring-2 focus:ring-indigo-100 outline-none custom-scrollbar" placeholder="-----BEGIN PRIVATE KEY-----"></textarea>
-                            </div>
+                            <input v-model="newSsl.name" type="text" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" placeholder="证书名称">
+                            <textarea v-model="newSsl.pem" class="w-full border border-slate-300 rounded-lg p-3 text-xs font-mono h-28" placeholder="PEM 内容"></textarea>
+                            <textarea v-model="newSsl.key" class="w-full border border-slate-300 rounded-lg p-3 text-xs font-mono h-28" placeholder="KEY 内容"></textarea>
                         </div>
-                        <button @click="saveSsl" class="w-full bg-slate-800 hover:bg-slate-900 text-white p-3 rounded-xl font-medium transition shadow-sm">保存 SSL 证书</button>
+                        <button @click="saveSsl" class="w-full bg-slate-800 text-white p-3 rounded-xl">保存证书</button>
                     </div>
-
-                    <div>
-                        <h3 class="font-medium text-slate-700 mb-3">已有的证书</h3>
-                        <div class="space-y-2">
-                            <div v-if="sslList.length === 0" class="text-center py-6 text-sm text-slate-400">暂无证书</div>
-                            <div v-for="ssl in sslList" :key="ssl" class="flex flex-row justify-between items-center p-3.5 bg-white rounded-lg border border-slate-200 gap-2 hover:shadow-sm transition">
-                                <span class="text-sm font-medium text-slate-800 truncate flex-1">{{ ssl }}</span>
-                                <div class="flex gap-2 sm:gap-4 flex-shrink-0">
-                                    <button @click="editSsl(ssl)" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition bg-indigo-50 px-2.5 py-1.5 rounded-md">编辑</button>
-                                    <button @click="deleteSsl(ssl)" class="text-rose-600 hover:text-rose-800 text-sm font-medium transition bg-rose-50 px-2.5 py-1.5 rounded-md">删除</button>
-                                </div>
+                    <div class="space-y-2">
+                        <div v-for="ssl in sslList" :key="ssl" class="flex justify-between items-center p-3.5 bg-white rounded-lg border border-slate-200">
+                            <span class="text-sm font-medium truncate">{{ ssl }}</span>
+                            <div class="flex gap-2">
+                                <button @click="editSsl(ssl)" class="text-indigo-600 text-sm bg-indigo-50 px-3 py-1.5 rounded-md">编辑</button>
+                                <button @click="deleteSsl(ssl)" class="text-rose-600 text-sm bg-rose-50 px-3 py-1.5 rounded-md">删除</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div v-if="currentTab === 'logs'" class="space-y-4">
-                    <h2 class="text-lg sm:text-xl font-semibold">节点访问日志</h2>
-                    <div>
-                        <label class="text-sm font-medium text-slate-700 block mb-1.5">选择日志文件</label>
-                        <select v-model="selectedLogFile" @change="loadLogContent" class="w-full sm:w-1/2 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-indigo-100 outline-none bg-white">
-                            <option value="">请选择日志文件</option>
-                            <option v-for="file in logFiles" :key="file" :value="file">{{ file }}</option>
-                        </select>
-                    </div>
-                    
-                    <div class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs h-[450px] sm:h-[500px] overflow-auto custom-scrollbar w-full">
-                        <pre v-if="logContent" class="whitespace-pre-wrap break-all">{{ logContent }}</pre>
-                        <div v-else class="text-slate-500 text-center mt-20">请在上方选择一个日志文件查看内容...</div>
+                    <h2 class="text-lg sm:text-xl font-semibold">访问日志</h2>
+                    <select v-model="selectedLogFile" @change="loadLogContent" class="w-full sm:w-1/2 border border-slate-300 rounded-lg p-2.5 text-sm bg-white">
+                        <option value="">选择日志文件</option>
+                        <option v-for="file in logFiles" :key="file" :value="file">{{ file }}</option>
+                    </select>
+                    <div class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs h-[500px] overflow-auto">
+                        <pre v-if="logContent">{{ logContent }}</pre>
+                        <div v-else class="text-slate-500 text-center mt-20">等待选择日志...</div>
                     </div>
                 </div>
 
                 <div v-if="currentTab === 'nodes'" class="space-y-6">
-                    <h2 class="text-lg sm:text-xl font-bold text-slate-800 border-b border-slate-100 pb-3">节点管理</h2>
+                    <h2 class="text-lg sm:text-xl font-bold">节点管理</h2>
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="lg:col-span-1 bg-slate-50 p-4 sm:p-5 rounded-xl border border-slate-200 h-fit">
-                            <h3 class="text-base font-bold text-slate-700 mb-4">{{ editingNodeIndex > -1 ? '编辑节点' : '+ 新增节点' }}</h3>
-                            <div class="space-y-3.5 text-sm">
-                                <div>
-                                    <label class="block text-slate-600 mb-1 font-medium">服务器名</label>
-                                    <input v-model="editingNode.name" type="text" placeholder="例如：Aliyun-JP" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-600 mb-1 font-medium">IP 地址</label>
-                                    <input v-model="editingNode.ip" type="text" placeholder="例如：127.0.0.1" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-600 mb-1 font-medium">SSH 端口</label>
-                                    <input v-model="editingNode.port" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-600 mb-1 font-medium">用户名</label>
-                                    <input v-model="editingNode.username" type="text" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100">
-                                </div>
-                                <div>
-                                    <label class="block text-slate-600 mb-1 font-medium">密码</label>
-                                    <input v-model="editingNode.password" type="password" placeholder="服务器 SSH 密码" class="w-full border border-slate-300 rounded-lg px-3 py-2.5 outline-none focus:ring-2 focus:ring-indigo-100">
-                                </div>
-                                <div class="flex gap-2 pt-3">
-                                    <button @click="saveNodeForm" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-lg transition font-medium">保存节点</button>
-                                    <button v-if="editingNodeIndex > -1" @click="resetNodeForm" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2.5 rounded-lg transition font-medium">取消</button>
-                                </div>
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200 h-fit">
+                            <h3 class="font-bold mb-4">{{ editingNodeIndex > -1 ? '编辑' : '新增' }}</h3>
+                            <div class="space-y-3 text-sm">
+                                <input v-model="editingNode.name" type="text" placeholder="节点名" class="w-full border rounded-lg px-3 py-2">
+                                <input v-model="editingNode.ip" type="text" placeholder="IP" class="w-full border rounded-lg px-3 py-2">
+                                <input v-model="editingNode.port" type="text" placeholder="SSH端口" class="w-full border rounded-lg px-3 py-2">
+                                <input v-model="editingNode.username" type="text" placeholder="SSH用户" class="w-full border rounded-lg px-3 py-2">
+                                <input v-model="editingNode.password" type="password" placeholder="SSH密码" class="w-full border rounded-lg px-3 py-2">
+                                <button @click="saveNodeForm" class="w-full bg-indigo-600 text-white py-2 rounded-lg mt-2">保存</button>
                             </div>
                         </div>
-
                         <div class="lg:col-span-2 space-y-3">
-                            <div v-if="nodes.length === 0" class="text-center py-10 text-slate-400 bg-slate-50/50 rounded-xl border border-slate-200 border-dashed">
-                                暂无节点，请在添加
-                            </div>
-                            <div v-for="(node, index) in nodes" :key="index" class="p-4 sm:p-5 bg-white border border-slate-200 rounded-xl hover:shadow-md hover:border-indigo-200 transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                                <div>
-                                    <div class="font-bold text-slate-800 text-base sm:text-lg flex items-center gap-2">
-                                        {{ node.name }}
-                                    </div>
-                                    <div class="text-xs sm:text-sm text-slate-500 mt-1.5 font-mono bg-slate-100 inline-block px-2 py-1 rounded">
-                                        {{ node.username }}@{{ node.ip }}:{{ node.port }}
-                                    </div>
-                                </div>
-                                <div class="flex space-x-2 w-full sm:w-auto">
-                                    <button @click="editNode(index)" class="flex-1 sm:flex-none text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-lg text-sm font-medium transition text-center">编辑</button>
-                                    <button @click="deleteNode(index)" class="flex-1 sm:flex-none text-rose-600 bg-rose-50 hover:bg-rose-100 px-4 py-2 rounded-lg text-sm font-medium transition text-center">删除</button>
+                            <div v-for="(node, index) in nodes" :key="index" class="p-4 bg-white border border-slate-200 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                                <div><div class="font-bold">{{ node.name }}</div><div class="text-xs font-mono text-slate-500">{{ node.username }}@{{ node.ip }}:{{ node.port }}</div></div>
+                                <div class="flex gap-2">
+                                    <button @click="editNode(index)" class="text-indigo-600 bg-indigo-50 px-4 py-2 rounded-lg text-sm">编辑</button>
+                                    <button @click="deleteNode(index)" class="text-rose-600 bg-rose-50 px-4 py-2 rounded-lg text-sm">删除</button>
                                 </div>
                             </div>
                         </div>
@@ -250,10 +199,9 @@
                 </div>
 
                 <div v-if="currentTab === 'console'" class="space-y-4">
-                    <h2 class="text-lg sm:text-xl font-semibold">终端命令输出</h2>
-                    <div ref="terminalBox" class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs sm:text-sm h-[500px] overflow-auto custom-scrollbar w-full">
-                        <pre v-if="terminalOutput" class="whitespace-pre-wrap break-all">{{ terminalOutput }}</pre>
-                        <div v-else class="text-slate-500 text-center mt-20">暂无正在执行的命令输出...</div>
+                    <h2 class="text-lg sm:text-xl font-semibold">终端输出</h2>
+                    <div ref="terminalBox" class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs h-[500px] overflow-auto">
+                        <pre v-if="terminalOutput">{{ terminalOutput }}</pre>
                     </div>
                 </div>
             </main>
@@ -267,12 +215,9 @@
 
     createApp({
         setup() {
-            // 登录相关状态
             const isLoggedIn = ref(false);
             const loggingIn = ref(false);
             const loginForm = ref({ username: '', password: '' });
-
-            // 基础状态
             const currentTab = ref('nginx');
             const sites = ref([]);
             const sslList = ref([]);
@@ -286,18 +231,12 @@
             const editingNodeIndex = ref(-1);
             const terminalBox = ref(null);
 
-            // API 请求统一 Header (含 Token)
-            const getHeaders = () => {
-                const token = localStorage.getItem('cdn_token');
-                return {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : ''
-                };
-            };
+            const getHeaders = () => ({
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('cdn_token') || ''}`
+            });
 
-            // 登录逻辑
             const handleLogin = async () => {
-                if (!loginForm.value.username || !loginForm.value.password) return alert("请完整填写信息");
                 loggingIn.value = true;
                 try {
                     const res = await fetch(`${API_BASE}/login`, {
@@ -309,21 +248,14 @@
                     if (data.success) {
                         localStorage.setItem('cdn_token', data.token);
                         isLoggedIn.value = true;
-                        initData(); // 登录成功后初始化数据
-                    } else {
-                        alert(data.message || "登录失败，请检查账号密码");
-                    }
-                } catch (e) { alert("连接后端服务失败"); }
+                        initData();
+                    } else alert(data.message);
+                } catch (e) { alert("连接失败"); }
                 finally { loggingIn.value = false; }
             };
 
-            const handleLogout = () => {
-                localStorage.removeItem('cdn_token');
-                isLoggedIn.value = false;
-                window.location.reload();
-            };
+            const handleLogout = () => { localStorage.removeItem('cdn_token'); window.location.reload(); };
 
-            // 站点配置
             const loadNginx = async () => {
                 try {
                     const res = await fetch(`${API_BASE}/nginx`, { headers: getHeaders() });
@@ -331,9 +263,11 @@
                     const data = await res.json();
                     sites.value = data.sites.map(s => ({
                         ...s,
+                        locations: s.locations || [], // 确保 locations 存在
+                        redirects: s.redirects || [],
                         cacheExts: s.cacheExts || 'css|jpeg|jpg|gif|png|webp|woff|eot|ttf|svg|ico'
                     }));
-                } catch (e) { console.error("Load Nginx Error:", e); }
+                } catch (e) { console.error(e); }
             };
 
             const saveNginx = async () => {
@@ -345,148 +279,50 @@
                     });
                     const data = await res.json();
                     alert(data.message);
-                } catch (e) { alert("保存失败！"); }
+                } catch (e) { alert("保存失败"); }
             };
 
-            // 证书管理
-            const loadSsl = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/ssl`, { headers: getHeaders() });
-                    const data = await res.json();
-                    sslList.value = data.ssls;
-                } catch (e) { console.error("Load SSL Error:", e); }
-            };
+            const addSite = () => sites.value.unshift({ name: '', origin: '', domains: [], sslCertName: '', redirects: [], locations: [], cacheExts: 'css|jpeg|jpg|gif|png|webp|woff|eot|ttf|svg|ico' });
+            const addRedirect = (site) => site.redirects.push({ from: '', to: '' });
+            const addLocation = (site) => site.locations.push({ path: '', origin: '', host: '' });
 
+            const loadSsl = async () => { const res = await fetch(`${API_BASE}/ssl`, { headers: getHeaders() }); const data = await res.json(); sslList.value = data.ssls; };
             const saveSsl = async () => {
-                if(!newSsl.value.name) return alert("请输入证书名称！");
-                try {
-                    const res = await fetch(`${API_BASE}/ssl`, {
-                        method: 'POST',
-                        headers: getHeaders(),
-                        body: JSON.stringify(newSsl.value)
-                    });
-                    const data = await res.json();
-                    alert(data.message);
-                    if(data.success) {
-                        newSsl.value = { name: '', pem: '', key: '' };
-                        loadSsl();
-                    }
-                } catch (e) { alert("保存失败！"); }
+                const res = await fetch(`${API_BASE}/ssl`, { method: 'POST', headers: getHeaders(), body: JSON.stringify(newSsl.value) });
+                const data = await res.json(); alert(data.message); if(data.success) { newSsl.value = { name:'', pem:'', key:'' }; loadSsl(); }
             };
+            const deleteSsl = async (name) => { if(confirm('删除?')) { await fetch(`${API_BASE}/ssl/${name}`, { method: 'DELETE', headers: getHeaders() }); loadSsl(); } };
+            const editSsl = async (name) => { const res = await fetch(`${API_BASE}/ssl/${name}`, { headers: getHeaders() }); const data = await res.json(); if(data.success) newSsl.value = { name: data.name, pem: data.pem, key: data.key }; };
 
-            const deleteSsl = async (name) => {
-                if (!confirm(`确定要删除证书 [${name}] 吗？`)) return;
-                try {
-                    const res = await fetch(`${API_BASE}/ssl/${name}`, { 
-                        method: 'DELETE',
-                        headers: getHeaders()
-                    });
-                    const data = await res.json();
-                    alert(data.message);
-                    if (data.success) loadSsl(); 
-                } catch (e) { alert("删除失败！"); }
-            };
-
-            // 节点管理
-            const loadNodes = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/nodes`, { headers: getHeaders() });
-                    const data = await res.json();
-                    nodes.value = data.nodes;
-                } catch (e) { console.error("Load Nodes Error:", e); }
-            };
-
-            const saveNodesToBackend = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/nodes`, {
-                        method: 'POST',
-                        headers: getHeaders(),
-                        body: JSON.stringify({ nodes: nodes.value })
-                    });
-                    const data = await res.json();
-                    alert(data.message);
-                    loadNodes();
-                } catch (e) { alert("保存失败！"); }
-            };
-
-            // 终端与日志
-            const triggerCmd = async (url) => {
-                currentTab.value = 'console';
-                terminalOutput.value = `正在执行命令，请稍候...\n`;
-                try {
-                    const res = await fetch(`${API_BASE}${url}`, { 
-                        method: 'POST',
-                        headers: getHeaders()
-                    });
-                    const data = await res.json();
-                    terminalOutput.value = data.output || "无输出返回。";
-                } catch (e) { terminalOutput.value = "请求接口失败: " + e.message; }
-            };
-
-            const loadLogs = async () => {
-                try {
-                    const res = await fetch(`${API_BASE}/logs`, { headers: getHeaders() });
-                    const data = await res.json();
-                    logFiles.value = data.files;
-                } catch (e) { console.error("Load Logs Error:", e); }
-            };
-
-            const loadLogContent = async () => {
-                if(!selectedLogFile.value) return;
-                try {
-                    const res = await fetch(`${API_BASE}/logs/${selectedLogFile.value}`, { headers: getHeaders() });
-                    const data = await res.json();
-                    logContent.value = data.content;
-                } catch (e) { alert("读取日志失败！"); }
-            };
-
-            // 初始化与辅助
-            const initData = () => {
-                loadNginx(); loadSsl(); loadLogs(); loadNodes();
-            };
-
-            onMounted(() => {
-                const token = localStorage.getItem('cdn_token');
-                if (token) {
-                    isLoggedIn.value = true;
-                    initData();
-                }
-            });
-
-            watch(terminalOutput, () => {
-                nextTick(() => { if (terminalBox.value) terminalBox.value.scrollTop = terminalBox.value.scrollHeight; });
-            });
-
-            const tabClass = (isActive) => `flex-shrink-0 md:w-full text-center md:text-left px-4 py-2.5 rounded-lg text-sm font-medium transition whitespace-nowrap ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`;
-
-            // 其他辅助方法保持
-            const addSite = () => sites.value.unshift({ name: '', origin: '', domains: [], sslCertName: '', redirects: [], cacheExts: 'css|jpeg|jpg|gif|png|webp|woff|eot|ttf|svg|ico' });
-            const addRedirect = (site) => { if(!site.redirects) site.redirects = []; site.redirects.push({ from: '', to: '' }); };
-            const editSsl = async (name) => {
-                try {
-                    const res = await fetch(`${API_BASE}/ssl/${name}`, { headers: getHeaders() });
-                    const data = await res.json();
-                    if (data.success) {
-                        newSsl.value = { name: data.name, pem: data.pem, key: data.key };
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }
-                } catch (e) { alert("加载失败！"); }
-            };
+            const loadNodes = async () => { const res = await fetch(`${API_BASE}/nodes`, { headers: getHeaders() }); const data = await res.json(); nodes.value = data.nodes; };
+            const saveNodesToBackend = async () => { await fetch(`${API_BASE}/nodes`, { method: 'POST', headers: getHeaders(), body: JSON.stringify({ nodes: nodes.value }) }); loadNodes(); };
             const saveNodeForm = () => {
-                if (!editingNode.value.name || !editingNode.value.ip) return alert('必填项缺失');
                 if (editingNodeIndex.value > -1) nodes.value[editingNodeIndex.value] = { ...editingNode.value };
                 else nodes.value.push({ ...editingNode.value });
-                saveNodesToBackend(); resetNodeForm();
+                saveNodesToBackend(); editingNodeIndex.value = -1; editingNode.value = { name: '', ip: '', port: '22', username: 'root', password: '' };
             };
-            const editNode = (index) => { editingNode.value = { ...nodes.value[index] }; editingNodeIndex.value = index; window.scrollTo({ top: 0, behavior: 'smooth' }); };
-            const deleteNode = (index) => { if (confirm(`确定删除?`)) { nodes.value.splice(index, 1); saveNodesToBackend(); } };
-            const resetNodeForm = () => { editingNode.value = { name: '', ip: '', port: '22', username: 'root', password: '' }; editingNodeIndex.value = -1; };
+            const editNode = (index) => { editingNode.value = { ...nodes.value[index] }; editingNodeIndex.value = index; };
+            const deleteNode = (index) => { if(confirm('删除?')) { nodes.value.splice(index, 1); saveNodesToBackend(); } };
+
+            const triggerCmd = async (url) => {
+                currentTab.value = 'console'; terminalOutput.value = `执行中...\n`;
+                const res = await fetch(`${API_BASE}${url}`, { method: 'POST', headers: getHeaders() });
+                const data = await res.json(); terminalOutput.value = data.output;
+            };
+
+            const loadLogs = async () => { const res = await fetch(`${API_BASE}/logs`, { headers: getHeaders() }); const data = await res.json(); logFiles.value = data.files; };
+            const loadLogContent = async () => { const res = await fetch(`${API_BASE}/logs/${selectedLogFile.value}`, { headers: getHeaders() }); const data = await res.json(); logContent.value = data.content; };
+
+            const initData = () => { loadNginx(); loadSsl(); loadLogs(); loadNodes(); };
+            onMounted(() => { if (localStorage.getItem('cdn_token')) { isLoggedIn.value = true; initData(); } });
+            watch(terminalOutput, () => nextTick(() => { if (terminalBox.value) terminalBox.value.scrollTop = terminalBox.value.scrollHeight; }));
 
             return {
                 isLoggedIn, loggingIn, loginForm, handleLogin, handleLogout,
                 currentTab, sites, sslList, logFiles, selectedLogFile, logContent, terminalOutput, newSsl, terminalBox,
-                addSite, addRedirect, saveNginx, saveSsl, triggerCmd, loadLogContent, tabClass, editSsl, deleteSsl, 
-                nodes, editingNode, editingNodeIndex, saveNodeForm, editNode, deleteNode, resetNodeForm
+                addSite, addRedirect, addLocation, saveNginx, saveSsl, triggerCmd, loadLogContent, editSsl, deleteSsl, 
+                nodes, editingNode, editingNodeIndex, saveNodeForm, editNode, deleteNode,
+                tabClass: (isActive) => `flex-shrink-0 md:w-full text-center md:text-left px-4 py-2.5 rounded-lg text-sm font-medium transition ${isActive ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-100'}`
             };
         }
     }).mount('#app');

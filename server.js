@@ -13,7 +13,7 @@ app.use(express.json());
 
 const JWT_SECRET = 'Welcome-to-Xiaolan-CDN-Web'; // JWT 签名密钥（建议随便打一串复杂的乱码）
 const ADMIN_USER = 'Admin'; // 用户名
-const ADMIN_PASSWORD = 'Admin@Pssword'; // 密码
+const ADMIN_PASSWORD = 'Admin@Password'; // 密码
 const CONFIG_DIR = '/opt/xiaolan-cdn-system/node-config'; // node-config文件夹所在路径
 const NGINX_CONF_PATH = path.join(CONFIG_DIR, 'nginx.conf'); // 这个不要改
 const UI_CONFIG_PATH = path.join(__dirname, 'cdn-config.json'); // 这个也不要改
@@ -30,7 +30,6 @@ if (!fs.existsSync(LOGS_DIR)) fs.mkdirSync(LOGS_DIR, { recursive: true });
 
 // 身份验证中间件
 const authMiddleware = (req, res, next) => {
-    // 获取请求头中的 Authorization: Bearer <token>
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
 
@@ -47,7 +46,6 @@ const authMiddleware = (req, res, next) => {
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
 
-    // 简单校验
     if (username === ADMIN_USER && password === ADMIN_PASSWORD) {
         const token = jwt.sign({ user: ADMIN_USER }, JWT_SECRET, { expiresIn: '24h' });
         return res.json({ success: true, token });
@@ -66,9 +64,35 @@ app.get('/api/nginx', authMiddleware, (req, res) => {
     res.json({ sites: [] });
 });
 
+// 生成统一的代理 location 块
+const generateLocationBlock = (pathRule, proxyPass, hostHeader) => {
+    return `
+        location ^~ ${pathRule} {
+            proxy_pass ${proxyPass};
+            proxy_ssl_server_name on;
+            proxy_set_header Host ${hostHeader};
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Real-Port $remote_port;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Host $host;
+            proxy_set_header X-Forwarded-Port $server_port;
+            proxy_set_header REMOTE-HOST $remote_addr;
+            proxy_hide_header Strict-Transport-Security;
+            proxy_connect_timeout 60s;
+            proxy_send_timeout 600s;
+            proxy_read_timeout 600s;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;  
+        }
+`;
+};
+
 app.post('/api/nginx', authMiddleware, (req, res) => {
     const { sites } = req.body;
     fs.writeFileSync(UI_CONFIG_PATH, JSON.stringify({ sites }, null, 4));
+    
     let nginxConf = `worker_processes auto;
 worker_rlimit_nofile 1048576;
 pid /opt/xiaolan-cdn/logs/nginx.pid;
@@ -169,27 +193,30 @@ http {
             proxy_cache xiaolan-cdn-cache;
             expires 14d;
         }
+`;
 
-        location ^~ / {
-            proxy_pass ${site.origin || 'http://127.0.0.1:80'};
-            proxy_ssl_server_name on;
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Real-Port $remote_port;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-            proxy_set_header X-Forwarded-Port $server_port;
-            proxy_set_header REMOTE-HOST $remote_addr;
-            proxy_hide_header Strict-Transport-Security;
-            proxy_connect_timeout 60s;
-            proxy_send_timeout 600s;
-            proxy_read_timeout 600s;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection $connection_upgrade;  
+        // === 新增：分路径回源逻辑 ===
+        let hasRootLocation = false;
+
+        if (site.locations && Array.isArray(site.locations)) {
+            site.locations.forEach(loc => {
+                // 判断用户是否配置了根目录，避免重复生成
+                if (loc.path.trim() === '/' || loc.path.trim() === '/') {
+                    hasRootLocation = true;
+                }
+                // 如果没有显式传 hostHeader，就使用$host
+                const hostHeader = loc.host || '$host';
+                nginxConf += generateLocationBlock(loc.path, loc.origin, hostHeader);
+            });
         }
-    }
+
+        // 如果用户没有自定义根路径，则生成默认的根路径回源
+        if (!hasRootLocation) {
+            const defaultOrigin = site.origin || 'http://127.0.0.1:80';
+            nginxConf += generateLocationBlock('/', defaultOrigin, '$host');
+        }
+
+        nginxConf += `    }
 `;
     });
 

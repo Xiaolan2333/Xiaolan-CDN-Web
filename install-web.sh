@@ -8,6 +8,7 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 nvm install 24
 echo "安装完成"
 echo "创建目录"
+mkdir /opt/xiaolan-cdn
 mkdir /opt/xiaolan-cdn/xiaolan-cdn-web
 echo "创建目录完成"
 echo "下载压缩包"

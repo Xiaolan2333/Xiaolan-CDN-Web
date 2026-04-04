@@ -42,4 +42,6 @@ echo "设置Systemd配置文件成功"
 echo "启动后端程序"
 systemctl daemon-reload
 systemctl enable xiaolan-cdn-web --now
+echo "清理临时文件"
+rm /opt/xiaolan-cdn/xiaolan-cdn-web/Xiaolan-CDN-Web.zip
 echo "Web后端安装完成"

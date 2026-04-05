@@ -2,14 +2,13 @@
 echo "Xiaolan-CDN-Web后端安装脚本"
 echo "安装所需运行库"
 apt update
-apt install wget unzip -y
+apt install wget unzip python3 -y
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 \. "$HOME/.nvm/nvm.sh"
 nvm install 24
 echo "安装完成"
 echo "创建目录"
-mkdir /opt/xiaolan-cdn
-mkdir /opt/xiaolan-cdn/xiaolan-cdn-web
+mkdir -p /opt/xiaolan-cdn/xiaolan-cdn-web
 echo "创建目录完成"
 echo "下载压缩包"
 wget -P /opt/xiaolan-cdn/xiaolan-cdn-web https://github.com/Xiaolan2333/Xiaolan-CDN-Web/releases/latest/download/Xiaolan-CDN-Web.zip
@@ -39,10 +38,26 @@ ExecStart=$NODE_PATH server.js
 [Install]
 WantedBy=multi-user.target
 EOF
+cat > /etc/systemd/system/xiaolan-cdn-web-http.service << EOF
+[Unit]
+Description=Python HTTP Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/xiaolan-cdn/xiaolan-cdn-web
+ExecStart=/usr/bin/python3 -m http.server 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
 echo "设置Systemd配置文件成功"
-echo "启动后端程序"
+echo "启动程序"
 systemctl daemon-reload
 systemctl enable xiaolan-cdn-web --now
+systemctl enable xiaolan-cdn-web-http --now
 echo "清理临时文件"
 rm /opt/xiaolan-cdn/xiaolan-cdn-web/Xiaolan-CDN-Web.zip
 echo "Web后端安装完成"

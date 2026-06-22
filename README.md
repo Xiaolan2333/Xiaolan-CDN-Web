@@ -1,3 +1,3 @@
 # Xiaolan-CDN-Web
 
-文档：[https://xiaolan2333.github.io](https://xiaolan2333.github.io)
+由于从V0.1.0开始System集成Web组件，所以此仓库暂时弃用
